@@ -14,16 +14,18 @@ RUN echo $TZ > /etc/timezone && \
  dpkg-reconfigure -f noninteractive tzdata && \
  chmod a+x /usr/local/bin/init.sh && \
  chmod a+x /usr/local/bin/start-nginx.sh && \ 
- apt-get update && apt-get install -y wget ca-certificates --no-install-recommends  && \
- apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF && \
- echo "deb http://download.mono-project.com/repo/ubuntu stable-xenial main" | tee /etc/apt/sources.list.d/mono-official-stable.list && \
- cd /tmp/ && wget http://nginx.org/keys/nginx_signing.key && \
+ apt-get update && apt-get install -y wget gnupg ca-certificates --no-install-recommends
+ RUN cd /tmp/ && wget http://nginx.org/keys/nginx_signing.key && \
  apt-key add /tmp/nginx_signing.key && \
- sh -c "echo 'deb http://nginx.org/packages/mainline/ubuntu/ xenial nginx' > /etc/apt/sources.list.d/Nginx.list"  && \
- apt-get update && apt-get install -y nginx mono-complete  && \
+ sh -c "echo 'deb http://nginx.org/packages/mainline/ubuntu/ xenial nginx' > /etc/apt/sources.list.d/Nginx.list"
+ RUN apt-get install -y curl
+ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+ apt-get update && apt-get install -y curl nginx nodejs  && \
  apt-get clean && \
  wget --ca-directory=/etc/ssl/certs -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64 && \
  chmod +x /usr/local/bin/dumb-init
+ RUN node -v
+ RUN npm -v
 
 COPY config/nginx.conf /etc/nginx/nginx.conf
 
